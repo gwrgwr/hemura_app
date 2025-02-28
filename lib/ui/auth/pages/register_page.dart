@@ -1,25 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:hemura/data/services/api_client.dart';
+import 'package:hemura/ui/auth/auth_viewmodel.dart';
 import 'package:hemura/ui/auth/components/google_button.dart';
 import 'package:hemura/ui/auth/components/my_textformfield.dart';
+import 'package:hemura/ui/session/pages/session_page.dart';
 import 'package:hemura/utils/enums/text_field_type.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({required this.pageController, super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({required this.pageController, super.key});
 
   final PageController pageController;
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameTextEditingController =
       TextEditingController();
+
   final TextEditingController lastNameTextEditingController =
       TextEditingController();
+
   final TextEditingController emailTextEditingController =
       TextEditingController();
+
   final TextEditingController senhaTextEditingController =
       TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
 
-  final userServices = ApiClient();
+  final _authViewModel = AuthViewModel();
+
+  @override
+  void initState() {
+    _authViewModel.registerUser.addListener(_listener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _authViewModel.registerUser.removeListener(_listener);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +95,12 @@ class RegisterPage extends StatelessWidget {
                             () => {
                               if (_formKey.currentState?.validate() != null)
                                 {
-                                  userServices.register(
+                                  _authViewModel.registerUser.execute((
                                     nameTextEditingController.text,
                                     lastNameTextEditingController.text,
                                     emailTextEditingController.text,
                                     senhaTextEditingController.text,
-                                  ),
+                                  )),
                                 },
                             },
                         child: Padding(
@@ -97,7 +120,7 @@ class RegisterPage extends StatelessWidget {
                         TextButton(
                           onPressed:
                               () => {
-                                pageController.previousPage(
+                                widget.pageController.previousPage(
                                   duration: Duration(milliseconds: 500),
                                   curve: Curves.ease,
                                 ),
@@ -114,5 +137,19 @@ class RegisterPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _listener() {
+    if (_authViewModel.registerUser.completed) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => SessionPage()),
+      );
+    }
+    if (_authViewModel.registerUser.error) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erro ao criar o usuário")));
+    }
   }
 }

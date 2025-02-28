@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:hemura/domain/task_entity.dart';
+import 'package:hemura/domain/user/user_create.dart';
 import 'package:hemura/domain/user/user_entity.dart';
 import 'package:hemura/utils/result.dart';
 import 'package:http/http.dart' as http;
@@ -24,23 +25,23 @@ class ApiClient {
     }
   }
 
-  Future<void> register(
+  Future<Result<UserCreate>> register(
       String name,
       String lastName,
       String email,
       String password,
       ) async {
-    final response = await http.post(
-      Uri.parse("$url/user"),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        "name": name,
-        "lastName": lastName,
-        "email": email,
-        "password": password,
-      }),
-    );
-    print(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse("$url/user"),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"name": name, "lastName": lastName, "email": email, "password": password}),
+      );
+      print(jsonDecode(response.body));
+      return Result.ok(UserCreate.fromMap(jsonDecode(response.body)));
+    } on Exception catch (error) {
+      return Result.error(error);
+    }
   }
 
   Future<Result<SessionEntity>> getSessions({required String userId}) async {

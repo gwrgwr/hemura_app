@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hemura/data/services/api_client.dart';
 import 'package:hemura/data/services/sharedpreferences_services.dart';
+import 'package:hemura/domain/user/user_create.dart';
 import 'package:hemura/domain/user/user_entity.dart';
 import 'package:hemura/ui/auth/user_provider.dart';
 import 'package:hemura/utils/result.dart';
@@ -26,6 +27,10 @@ class AuthRepository {
     } on Exception catch (error) {
       return Result.error(error);
     }
+  }
+
+  Future<Result<UserCreate>> register(String name, String lastName, String email, String password) async {
+    return await userService.register(name, lastName, email, password);
   }
 
   Future<Result<void>> logoutUser() async {

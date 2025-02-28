@@ -30,7 +30,6 @@ class TaskViewModel {
         switch (tasks) {
           case Ok<List<TaskEntity>>():
             taskList = tasks.value;
-            print(taskList[10]);
             return Result.ok(null);
           case Error<List<TaskEntity>>():
             return Result.error(tasks.error);

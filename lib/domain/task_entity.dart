@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class TaskEntity {
   String id;
   String title;
@@ -79,11 +81,10 @@ class TaskEntity {
   }
 
   factory TaskEntity.fromMap(Map<String, dynamic> map) {
-    print(map['description'] as String);
     return TaskEntity(
       id: map['id'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String,
+      title: utf8.decode((map['title'] as String).codeUnits),
+      description: utf8.decode((map['description'] as String).codeUnits),
       isCompleted: map['isCompleted'] as bool,
       weekDay: map['weekDay'] as String,
       time: map['time'] as String,
